@@ -1,0 +1,12 @@
+=== REGISTRO DE TRAZABILIDAD DEL ENTORNO (GRUPO 3) ===
+Sistema Operativo : Windows 10
+Python            : 3.14.0
+scikit-learn      : 1.9.1
+umap-learn        : 0.6.0
+NumPy             : 2.5.5
+Pandas            : 3.1.1
+Semilla global    : 42
+Dataset           : Wine (178 muestras, 13 variables, StandardScaler)
+K-means           : k=3, n_init=20, random_state=42
+PCA 2D            : var_PC1=36.2%, var_PC2=19.21%, total=55.41%
+UMAP 2D           : n_neighbors=15, min_dist=0.1, random_state=42

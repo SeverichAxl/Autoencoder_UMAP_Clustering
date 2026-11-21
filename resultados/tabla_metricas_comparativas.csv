@@ -1,0 +1,3 @@
+Representacion,k,Silhouette_Score,Inercia_2D,ARI_Comparacion_Externa,NMI_Comparacion_Externa
+PCA 2D (Lineal),3,0.5611,259.5094,0.8951,0.8821
+UMAP 2D (No lineal),3,0.7111,202.2043,0.8025,0.7955

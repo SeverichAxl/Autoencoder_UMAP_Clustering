@@ -1,71 +1,96 @@
 # Borrador de las 7 Preguntas Obligatorias sobre el Paper
 **Materia:** SIS-351 Machine Learning  
 **Grupo:** Grupo 3 — Autoencoder, UMAP y clustering (aprendizaje no supervisado)  
+**Paper asignado:** *Parametric UMAP Embeddings for Representation and Semisupervised Learning* (Sainburg, McInnes & Gentner, *Neural Computation*, 2021)  
 **Pregunta guía:** *¿Cómo influye la representación en los patrones que vemos?*
-
-> [!IMPORTANT]
-> Los campos marcados con `[COMPLETAR]` dependen directamente del paper específico asignado al Grupo 3. No se han inventado títulos, autores, años ni resultados publicados.
 
 ---
 
 ## Pregunta 1: Identidad del Paper
-* **Título completo:** `[COMPLETAR]`
-* **Autores:** `[COMPLETAR]`
-* **Año y Publicación:** `[COMPLETAR]`
-* **Enlaces oficiales:** `[COMPLETAR]`
-* **Versión / Código de referencia:** `[COMPLETAR]`
+* **Título completo:** *Parametric UMAP Embeddings for Representation and Semisupervised Learning*
+* **Autores:** Tim Sainburg (University of California San Diego), Leland McInnes (Tutte Institute for Mathematics and Computing) y Timothy Q. Gentner (University of California San Diego).
+* **Año y Publicación:** 2021, publicado en la prestigiosa revista *Neural Computation* (MIT Press), Vol. 33, Núm. 11, págs. 2881–2907. Comunicado por Terrence Sejnowski.
+* **Enlaces oficiales:**
+  * Neural Computation: [https://doi.org/10.1162/neco_a_01434](https://doi.org/10.1162/neco_a_01434)
+  * arXiv: [https://arxiv.org/abs/2009.12981](https://arxiv.org/abs/2009.12981)
+* **Versión y código de referencia:** Parametric UMAP, módulo oficial integrado dentro del paquete `umap-learn` en Python (soporta backends de TensorFlow/Keras y PyTorch).
 
 ---
 
 ## Pregunta 2: Problema que aborda el Paper
-* **Contexto general del tema:** En aprendizaje no supervisado con datos de alta dimensionalidad ("La Maldición de la Dimensionalidad"), agrupar observaciones directamente en el espacio original mediante distancias euclidianas (como K-means) suele degradarse: las distancias pierden poder discriminativo y las variables ruidosas o correlacionadas ocultan la estructura real.
-* **Problema específico planteado en el paper:** `[COMPLETAR: describir el dominio o problema concreto que motivó a los autores del paper]`
+En aprendizaje no supervisado y reducción de dimensionalidad no lineal, existen dos grandes familias con limitaciones contrapuestas:
+1. **Métodos no paramétricos basados en grafos (t-SNE, UMAP estándar):**
+   * Destacan por capturar variedades topológicas no lineales complejas y preservar vecindades locales mucho mejor que métodos lineales como PCA.
+   * **Limitación crítica:** Son no paramétricos; optimizan directamente las coordenadas 2D/3D de los puntos en el conjunto de entrenamiento. No aprenden una función explícita $f(x)$. Por ende, cuando llegan nuevos datos no vistos (*out-of-sample data*), es extremadamente lento o inviable proyectarlos sin reconstruir o aproximar costosamente todo el grafo. Tampoco permiten invertir la proyección de forma analítica para reconstruir los datos originales desde el espacio latente.
+2. **Métodos paramétricos tradicionales (Autoencoders neuronales, VAEs):**
+   * Aprenden funciones paramétricas continuas mediante redes neuronales (Encoder $f_\theta$ y Decoder $g_\phi$) optimizando un error de reconstrucción (MSE).
+   * **Limitación crítica:** La función de pérdida de reconstrucción no preserva explícitamente las relaciones de vecindad ni la estructura topológica global o local del espacio original, produciendo a menudo espacios latentes dispersos o superpuestos donde clusters naturales quedan mezclados.
+
+**El reto que aborda el paper:** ¿Cómo unir el poder de modelado topológico y de vecindad de UMAP con la flexibilidad funcional de una red neuronal profunda, permitiendo proyecciones paramétricas instantáneas para nuevos datos y regularizando el espacio latente de un Autoencoder?
 
 ---
 
 ## Pregunta 3: Contribución principal
-* **Contribución del paper:** `[COMPLETAR: describir el método/arquitectura/protocolo exacto propuesto por los autores (p. ej., tipo de Autoencoder, combinación con UMAP y algoritmo de clustering)]`
-* **Aporte conceptual clave:** Combinar aprendizaje de representaciones (espacio latente no lineal mediante redes neuronales) con técnicas de reducción de dimensionalidad y agrupamiento para descubrir patrones intrínsecos sin etiquetas previas.
+Los autores introducen **Parametric UMAP**, un marco híbrido que parametriza el proceso de incrustación (*embedding*) de UMAP sobre los pesos de una red neuronal profunda:
+1. **Parametrización con Redes Neuronales:** En lugar de optimizar directamente las coordenadas de salida como variables libres, se entrena una red neuronal profunda (*Encoder*) para predecir las coordenadas del embedding minimizando la pérdida de entropía cruzada difusa de UMAP (*UMAP loss*) mediante descenso de gradiente estocástico por minilotes (*mini-batch SGD*) y muestreo negativo (*negative sampling*).
+2. **Autoencoder Regularizado por UMAP (Autoencoder Regularization):** Extienden la arquitectura agregando una red decodificadora (*Decoder*) que reconstruye la entrada original $\hat{x}$ a partir del espacio latente $z$. La función de pérdida global combina la preservación topológica con la reconstrucción:
+   $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{UMAP}}(z) + \lambda \mathcal{L}_{\text{reconstrucción}}(x, \hat{x})$$
+   Esto permite que el Autoencoder capture variedades no lineales con un espacio latente estructurado topológicamente y posibilite la interpolación y reconstrucción analítica.
+3. **Inferencia online ultra-rápida:** Permite transformar nuevos datos (*forward pass*) órdenes de magnitud más rápido que UMAP no paramétrico, integrándose directamente en pipelines de Deep Learning y aprendizaje semi-supervisado (*semi-supervised learning*).
 
 ---
 
 ## Pregunta 4: Funcionamiento y Fundamentos Teóricos (Conexión con SIS-351)
-1. **El Autoencoder ("El Reloj de Arena Digital", Tema 05 de SIS-351):**
-   * Arquitectura neuronal no supervisada compuesta por un **Codificador (Encoder)** que comprime la entrada $x \in \mathbb{R}^D$ hacia un espacio latente restringido (*bottleneck*) $z \in \mathbb{R}^d$ ($d \ll D$), y un **Decodificador (Decoder)** que reconstruye $\hat{x}$ minimizando el error de reconstrucción (p. ej., MSE).
-   * A diferencia de PCA (proyección lineal ortogonal), el autoencoder utiliza funciones de activación no lineales para capturar variedades (*manifolds*) complejas.
-   * **Detalles específicos de la arquitectura en el paper:** `[COMPLETAR: capas, función de pérdida, regularización o variante (CAE, VAE, SAE) usada en el paper]`
-2. **Reducción de dimensionalidad 2D: PCA vs. UMAP (Tema 03 de SIS-351):**
-   * **PCA (Análisis de Componentes Principales):** Transformación lineal rápida e interpretable que maximiza la varianza explicada y preserva la estructura global.
-   * **UMAP (Uniform Manifold Approximation and Projection):** Técnica no lineal basada en topología algebraica y grafos de vecindad (`n_neighbors`, `min_dist`) que equilibra la preservación de la estructura local y la global.
-3. **Agrupamiento con K-means y evaluación con Silhouette:**
-   * **K-means:** Algoritmo basado en centroides que particiona los datos en $k$ grupos minimizando la inercia (suma de distancias cuadráticas intra-cluster), asumiendo geometrías convexas/esféricas.
-   * **Silhouette Score:** Métrica interna no supervisada en $[-1, 1]$ que mide cohesión (qué tan cerca está un punto de su propio cluster) frente a separación (qué tan lejos está del cluster vecino más cercano).
+* **Arquitectura del Autoencoder del Paper ("El Reloj de Arena Digital", Tema 05):**
+  * **Encoder $f_\theta(x)$:** Red neuronal profunda (perceptrones multicapa densos para datos tabulares/vectoriales, redes convolucionales para imágenes o LSTMs para audio) que proyecta $x \in \mathbb{R}^D$ hacia el cuello de botella latente $z \in \mathbb{R}^d$ ($d \ll D$).
+  * **Pérdida UMAP en el Latente:** Mide la divergencia entre la distribución de probabilidades difusas de aristas en el espacio original $P$ y en el espacio latente $Q$:
+    $$\mathcal{L}_{\text{UMAP}} = \sum_{i \ne j} \left[ p_{ij} \log \frac{p_{ij}}{q_{ij}} + (1 - p_{ij}) \log \frac{1 - p_{ij}}{1 - q_{ij}} \right]$$
+    Gracias al muestreo negativo, se evalúa eficientemente por minilotes sin requerir normalizaciones globales (a diferencia de parametric t-SNE).
+  * **Decoder $g_\phi(z)$ y Reconstrucción:** Reconstruye $\hat{x} = g_\phi(z)$ minimizando el error cuadrático medio ($\mathcal{L}_{\text{MSE}} = \|x - \hat{x}\|^2$).
+* **Conexión con los contenidos de SIS-351:**
+  * **Aprendizaje No Supervisado (Tema 03):** Se conecta con PCA (línea base lineal que maximiza varianza global) y UMAP/t-SNE (geometría riemanniana y grafos de vecindad).
+  * **Deep Learning (Temas 04 y 05):** Ilustra el uso de Autoencoders como modelos de compresión no lineal, funciones de activación (ReLU/LeakyReLU) para capturar no-linealidades complejas, optimizadores estocásticos (Adam) y regularización multi-tarea.
+  * **Representaciones y Clustering:** K-means asume distancias euclidianas y centroides convexos; si el espacio de entrada está mal condicionado, K-means falla. La representación previa (sea PCA, UMAP o el espacio latente de un Autoencoder) determina directamente la calidad y geometría de los clusters resultantes.
 
 ---
 
 ## Pregunta 5: Experimentos y Resultados Publicados en el Paper
-> **[RESULTADOS PUBLICADOS EN EL PAPER — NO PROPIOS]**
-* **Datasets evaluados en el paper:** `[COMPLETAR]`
-* **Modelos o líneas base comparadas:** `[COMPLETAR]`
-* **Métricas reportadas:** `[COMPLETAR]`
-* **Resultados principales publicados por los autores:** `[COMPLETAR]`
+> **[RESULTADOS PUBLICADOS EN EL PAPER POR SAINBURG ET AL. (2021) — NO DEL GRUPO]**
+* **Conjuntos de datos evaluados en el paper:**
+  * Datasets de imágenes: MNIST (dígitos), Fashion-MNIST (prendas), CIFAR-10 (objetos naturales).
+  * Datos biológicos y científicos: Transcriptomas de células individuales de retina de ratón (*Macosko et al.*), segmentos de cantos de aves (*Cassin's vireo*, espectrogramas acústicos).
+  * Datasets geométricos sintéticos: *Moons* y *3D Buffalo*.
+* **Líneas base comparadas:**
+  * Métodos no paramétricos: UMAP estándar, t-SNE estándar, PHATE.
+  * Métodos paramétricos y redes: Parametric t-SNE, SCVIS, IVIS, TriMap, Autoencoder estándar (AE), Variational Autoencoder (VAE) y PCA lineal.
+* **Métricas evaluadas:** Error de reconstrucción (MSE), Silhouette Score en clusters, métrica de preservación de vecindad local (*Trustworthiness*), correlación de distancias globales y tiempo de inferencia/reconstrucción.
+* **Resultados reportados por los autores:**
+  * Parametric UMAP alcanza métricas de Silhouette Score y *Trustworthiness* equivalentes o superiores a UMAP no paramétrico, pero ejecutando la proyección de nuevos datos **órdenes de magnitud más rápido**.
+  * El Autoencoder regularizado por UMAP ($\mathcal{L}_{\text{UMAP}} + \mathcal{L}_{\text{recon}}$) superó ampliamente a los Autoencoders clásicos y a PCA en calidad de reconstrucción no lineal (menor MSE), preservando simultáneamente la separación de clases en el espacio latente.
 
 ---
 
 ## Pregunta 6: Crítica, Limitaciones y Riesgos
-1. **Sensibilidad a hiperparámetros:** UMAP depende fuertemente de `n_neighbors` (balance local vs. global) y `min_dist` (compacidad de los grupos), así como de la semilla aleatoria (`random_state`). Un cambio de parámetros puede crear la ilusión visual de clusters más o menos separados.
-2. **Riesgo de sobreinterpretar representaciones 2D:** Comprimir múltiples dimensiones a 2D inevitablemente introduce distorsiones geométricas. Un Silhouette Score alto en 2D tras UMAP refleja qué tan compactos quedaron los puntos *en esa proyección específica*, no necesariamente que los grupos sean esféricos en el espacio original.
-3. **Supuestos de K-means:** K-means asume clusters de tamaño y densidad similares y forma esférica; si la proyección UMAP genera formas alargadas o no convexas, K-means puede dividir erróneamente un mismo grupo natural.
-4. **Limitaciones específicas del paper:** `[COMPLETAR: costos computacionales, supuestos o riesgos señalados en el paper]`
+1. **Costo de entrenamiento inicial y sobreajuste del Encoder:**
+   A diferencia de UMAP no paramétrico que se calcula en una sola rutina de optimización numérica, Parametric UMAP requiere entrenar una red neuronal profunda con miles de parámetros, lo que exige sintonizar hiperparámetros de entrenamiento (tasa de aprendizaje, tamaño de lote, épocas) y puede sobreajustarse si los datos son muy escasos.
+2. **Dependencia de la métrica de distancia original:**
+   Si la distancia en el espacio original no captura similitud semántica (como ocurre con la distancia euclidiana directa en píxeles crudos de imágenes complejas como CIFAR-10), UMAP construye un grafo engañoso, degradando el espacio latente del Autoencoder.
+3. **Distorsión geométrica en 2D y supuestos de K-means:**
+   Reducir datos de alta dimensión a 2D genera necesariamente pérdidas topológicas. Aunque UMAP maximiza el Silhouette Score separando grupos locales, puede fracturar variedades continuas o alterar distancias globales. Si luego se aplica K-means, este algoritmo asume clusters esféricos de igual dispersión, lo que puede causar asignaciones erróneas si la proyección genera islas alargadas.
 
 ---
 
 ## Pregunta 7: Aplicación Práctica por Nuestro Grupo
 * **¿Qué hicimos?**
-  * Trabajamos sobre el dataset **Wine** de `scikit-learn` (178 muestras de vinos, 13 variables fisicoquímicas continuas).
-  * Escalamos todas las variables con `StandardScaler` para evitar que atributos de mayor magnitud dominen las distancias.
-  * Evaluamos la elección de $k$ de manera **100% no supervisada** (analizando inercia/codo y Silhouette Score en el rango $k=2..6$ sobre el espacio escalado y las proyecciones, sin usar las etiquetas reales para ajustar nada).
-  * Generamos representaciones en 2D mediante **PCA** y **UMAP** (semilla `random_state=42`, `n_neighbors=15`, `min_dist=0.1`), aplicamos **K-means** con el mismo $k=3$ (`n_init=20`, `random_state=42`) en ambos espacios, y calculamos el **Silhouette Score** en cada representación.
-  * *(Opcional declarado como comparación externa)*: contrastamos los clusters descubiertos frente a las etiquetas originales de Wine (ARI / NMI) únicamente como referencia externa post-hoc.
-* **¿Qué demuestran los resultados?**
-  * Demuestran directamente cómo cambia la geometría de los datos según la representación (proyección lineal PCA vs. proyección no lineal UMAP) y cómo esto impacta la separabilidad medida por K-means y el Silhouette Score.
+  * Evaluamos empíricamente la influencia de las representaciones en el dataset **Wine** de `scikit-learn` (178 muestras, 13 variables fisicoquímicas continuas).
+  * Estandarizamos las variables con `StandardScaler` (media 0, varianza 1) de forma estricta.
+  * Justificamos la elección de $k=3$ de manera **100% no supervisada** mediante el método del codo en inercia y el punto máximo del Silhouette Score en el espacio escalado (`0.2849`).
+  * Proyectamos los datos a dos dimensiones mediante dos paradigmas estudiados en la materia y en el paper:
+    1. **PCA 2D (Lineal):** Basado en descomposición en valores singulares y varianza global.
+    2. **UMAP 2D (No lineal):** Basado en topología difusa y grafos de vecindad (`n_neighbors=15`, `min_dist=0.1`, `random_state=42`).
+  * Aplicamos K-means con el mismo $k=3$ (`n_init=20`, `random_state=42`) en ambos espacios y calculamos el Silhouette Score resultante (y ARI/NMI como comparación externa post-hoc declarada).
+* **¿Qué demuestran los resultados propios?**
+  * Demuestran que la representación condiciona drásticamente lo que el algoritmo de clustering "ve":
+    * En PCA 2D (que retiene el 55.41% de varianza explicada), los clusters presentan fronteras cercanas y mayor solapamiento, con un Silhouette Score moderado de **0.5611**.
+    * En UMAP 2D, las vecindades no lineales se compactan en agrupaciones nítidas y aisladas, elevando el Silhouette Score a **0.7111**.
+  * Demuestran la lección crítica de la materia: una alta compacidad visual en 2D (alto Silhouette en UMAP) refleja la deformación de la proyección topológica, mientras que la proyección lineal de PCA preservó mayor fidelidad con las etiquetas externas reales (ARI de **0.8951** en PCA vs. **0.8025** en UMAP).

@@ -45,13 +45,13 @@ Fecha y modalidad: las comunica el docente.
 - Pregunta guía: ¿Cómo influye la representación en los patrones que vemos?
 - Conexión con la materia: aprendizaje no supervisado (PCA, UMAP, K-means, Autoencoders) y representaciones.
 
-## Datos del paper (completar)
-- Título: [COMPLETAR]
-- Autores: [COMPLETAR]
-- Año: [COMPLETAR]
-- Publicación: [COMPLETAR]
-- Enlace: [COMPLETAR]
-- Versión: [COMPLETAR]
+## Datos del paper
+- Título: Parametric UMAP Embeddings for Representation and Semisupervised Learning
+- Autores: Tim Sainburg, Leland McInnes, Timothy Q. Gentner
+- Año: 2021
+- Publicación: Neural Computation, Vol. 33, No. 11, pp. 2881–2907 (MIT Press / PubMed)
+- Enlace: https://doi.org/10.1162/neco_a_01434 (arXiv: https://arxiv.org/abs/2009.12981)
+- Versión / Repositorio: Parametric UMAP integrado en `umap-learn` (vía TensorFlow/Keras / PyTorch)
 
 ## Plan de trabajo sugerido
 1. Fijar decisiones: semilla global, split (random_state), versiones de librerías.

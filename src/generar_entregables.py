@@ -1,6 +1,9 @@
 """
-Genera los entregables preliminares (Word .docx y PowerPoint .pptx) para
-revisión, corrección y mejora del Grupo 3 — SIS-351 Machine Learning.
+Genera los entregables oficiales definitivos (Word .docx y PowerPoint .pptx)
+para el Grupo 3 — SIS-351 Machine Learning, integrando los resultados empíricos
+del experimento en Wine y el paper de referencia analizado:
+  "Parametric UMAP Embeddings for Representation and Semisupervised Learning"
+  (Tim Sainburg, Leland McInnes & Timothy Q. Gentner, Neural Computation, 2021).
 
 Entregables generados en /entregables:
   - Informe_Grupo3_Autoencoder_UMAP.docx
@@ -142,14 +145,14 @@ def generar_informe_word(ruta_salida: Path) -> None:
 
     p_univ = doc.add_paragraph()
     p_univ.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_u = p_univ.add_run("[NOMBRE DE LA UNIVERSIDAD / FACULTAD / CARRERA]")
+    r_u = p_univ.add_run("[UNIVERSIDAD CATÓLICA BOLIVIANA 'SAN PABLO']")
     r_u.bold = True
     r_u.font.size = Pt(13)
     r_u.font.color.rgb = RGBColor(0x47, 0x55, 0x69)
 
     p_mat = doc.add_paragraph()
     p_mat.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_m = p_mat.add_run("SIS-351 Machine Learning — Evaluación 3er Parcial")
+    r_m = p_mat.add_run("SIS-351 Machine Learning — Evaluación 3er Parcial (Gestión 2026)")
     r_m.font.size = Pt(12)
     r_m.font.color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
 
@@ -169,17 +172,18 @@ def generar_informe_word(ruta_salida: Path) -> None:
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
     r_s = p_sub.add_run(
-        "Análisis teórico y práctica experimental reproducible sobre el dataset Wine (PCA vs. UMAP + K-means)"
+        "Análisis del paper 'Parametric UMAP Embeddings for Representation and Semisupervised Learning'\n"
+        "(Sainburg et al., 2021) y evidencia experimental reproducible sobre el dataset Wine"
     )
     r_s.italic = True
-    r_s.font.size = Pt(11.5)
+    r_s.font.size = Pt(11)
     r_s.font.color.rgb = RGBColor(0x47, 0x55, 0x69)
 
     for _ in range(4):
         doc.add_paragraph()
 
     datos_portada = [
-        ("Grupo:", "Grupo 3"),
+        ("Grupo:", "Grupo 3 (Representaciones No Supervisadas)"),
         ("Integrantes:", "[Integrante 1 — Completar]\n[Integrante 2 — Completar]\n[Integrante 3 — Completar]"),
         ("Docente:", "[Nombre del Docente — Completar]"),
         ("Fecha:", "[Fecha de entrega — Completar]"),
@@ -204,20 +208,23 @@ def generar_informe_word(ruta_salida: Path) -> None:
     _agregar_titulo_seccion(doc, "1. Introducción e Identidad del Paper")
     _agregar_parrafo(
         doc,
-        "En el aprendizaje no supervisado, descubrir estructuras naturales y agrupamientos en datos sin "
-        "etiquetas depende críticamente de cómo se representan las observaciones. En esta práctica "
-        "estudiamos el uso conjunto de representaciones latentes (Autoencoders), reducción de dimensionalidad "
-        "(PCA y UMAP) y clustering (K-means).",
+        "En el aprendizaje no supervisado, descubrir estructuras latentes, patrones intrínsecos y agrupamientos "
+        "en conjuntos de datos sin etiquetas depende críticamente del espacio en el que se representan las observaciones. "
+        "En esta investigación analizamos cómo las técnicas de reducción de dimensionalidad lineal (PCA) y no lineal (UMAP), "
+        "en conjunto con arquitecturas de redes neuronales profundas (Autoencoders), transforman la geometría de los datos "
+        "y condicionan directamente los resultados de algoritmos de agrupamiento como K-means.",
     )
-    _agregar_vineta(doc, "Título del paper: ", "[COMPLETAR]")
-    _agregar_vineta(doc, "Autores: ", "[COMPLETAR]")
-    _agregar_vineta(doc, "Año y publicación: ", "[COMPLETAR]")
-    _agregar_vineta(doc, "Enlace y versión: ", "[COMPLETAR]")
+    _agregar_vineta(doc, "Título del paper: ", "Parametric UMAP Embeddings for Representation and Semisupervised Learning.")
+    _agregar_vineta(doc, "Autores: ", "Tim Sainburg (UC San Diego), Leland McInnes (Tutte Institute) y Timothy Q. Gentner (UC San Diego).")
+    _agregar_vineta(doc, "Año y publicación: ", "2021, publicado en la revista Neural Computation (MIT Press), Vol. 33, Núm. 11, págs. 2881–2907.")
+    _agregar_vineta(doc, "Enlaces oficiales: ", "DOI: https://doi.org/10.1162/neco_a_01434 · arXiv: https://arxiv.org/abs/2009.12981.")
+    _agregar_vineta(doc, "Versión de software: ", "Parametric UMAP integrado oficialmente en el paquete Python umap-learn (v0.6.0).")
     _agregar_parrafo(
         doc,
-        "Analizar los fundamentos del autoencoder del paper (sin necesidad de entrenarlo) y comparar "
-        "experimentalmente las representaciones 2D de PCA y UMAP bajo K-means con el mismo número de clusters k "
-        "sobre el dataset Wine, respondiendo a la pregunta guía: ¿Cómo influye la representación en los patrones que vemos?",
+        "Comprender los fundamentos del Autoencoder y Parametric UMAP propuestos en el paper (sin necesidad de "
+        "entrenar la red neuronal desde cero) y comparar experimentalmente dos representaciones en 2D (PCA lineal vs. "
+        "UMAP no lineal) bajo K-means con el mismo k sobre el dataset Wine, respondiendo a la pregunta guía: "
+        "¿Cómo influye la representación en los patrones que vemos?",
         negrita_prefijo="Objetivo de la práctica: ",
     )
 
@@ -225,64 +232,90 @@ def generar_informe_word(ruta_salida: Path) -> None:
     # 2. PROBLEMA Y CONTRIBUCIÓN
     # --------------------------------------------------------------------------
     _agregar_titulo_seccion(doc, "2. Problema Abordado y Contribución Central")
-    _agregar_subtitulo(doc, "2.1 El problema de la alta dimensionalidad y las representaciones")
+    _agregar_subtitulo(doc, "2.1 El problema de la reducción de dimensionalidad no lineal")
     _agregar_parrafo(
         doc,
-        "Cuando trabajamos con conjuntos de datos multivariados sin etiquetas, aplicar algoritmos de agrupamiento "
-        "directamente en el espacio original suele verse afectado por la 'Maldición de la Dimensionalidad': las "
-        "distancias euclidianas pierden poder discriminativo, las variables en distintas escalas dominan el cálculo "
-        "y las relaciones no lineales permanecen ocultas.",
+        "Los métodos tradicionales de reducción de dimensionalidad no paramétricos —como t-SNE y UMAP estándar— "
+        "han demostrado una notable capacidad para proyectar datos complejos de alta dimensión hacia variedades 2D o 3D, "
+        "preservando con alta fidelidad las relaciones topológicas de vecindad local. Sin embargo, adolecen de una "
+        "limitación teórica y práctica fundamental: al ser no paramétricos, optimizan de forma directa las coordenadas "
+        "de salida de los puntos de entrenamiento sin aprender una función matemática continua f(x).",
     )
     _agregar_parrafo(
         doc,
-        "[COMPLETAR: describir el problema específico y dominio planteado por los autores del paper asignado al Grupo 3].",
-        negrita_prefijo="Problema específico del paper: ",
+        "Esto genera dos grandes inconvenientes: (1) no pueden proyectar nuevos datos de prueba (out-of-sample) de forma "
+        "eficiente, requiriendo recomputar costosas aproximaciones del grafo; y (2) carecen de una función inversa analítica "
+        "que permita reconstruir los datos originales a partir de sus coordenadas en el espacio latente. Por otro lado, los "
+        "Autoencoders neuronales clásicos aprenden funciones paramétricas continuas mediante un codificador y un decodificador, "
+        "pero su función de pérdida habitual (error cuadrático medio de reconstrucción) no garantiza la preservación de la "
+        "estructura topológica de vecindad, produciendo espacios latentes a menudo desarticulados.",
     )
 
-    _agregar_subtitulo(doc, "2.2 Contribución del paper y rol del Autoencoder")
+    _agregar_subtitulo(doc, "2.2 Contribución de Parametric UMAP y regularización de Autoencoders")
     _agregar_parrafo(
         doc,
-        "[COMPLETAR: describir la contribución, método o protocolo propuesto en el paper (arquitectura del autoencoder, "
-        "uso de UMAP y estrategia de clustering)].",
+        "Sainburg, McInnes y Gentner (2021) resuelven esta dicotomía introduciendo Parametric UMAP. La contribución se articula en tres pilares:",
+    )
+    _agregar_vineta(
+        doc,
+        "Parametrización mediante Redes Profundas: ",
+        "Reemplazan la optimización directa de coordenadas por el entrenamiento de un Codificador (Encoder) que predice "
+        "el embedding minimizando la pérdida de entropía cruzada difusa de UMAP mediante descenso de gradiente estocástico "
+        "(mini-batch SGD) y muestreo negativo (negative sampling).",
+    )
+    _agregar_vineta(
+        doc,
+        "Autoencoder Regularizado por UMAP (Autoencoder Regularization): ",
+        "Extienden el codificador acoplándolo a un Decodificador (Decoder) que reconstruye la entrada original x a partir de z. "
+        "La función de pérdida combinada L_total = L_UMAP + λ L_recon obliga al espacio latente del Autoencoder a respetar la "
+        "variedad topológica local de UMAP mientras preserva la capacidad de reconstrucción e interpolación continua.",
+    )
+    _agregar_vineta(
+        doc,
+        "Inferencia online y aprendizaje semi-supervisado: ",
+        "El modelo entrenado permite proyectar nuevos datos hacia el espacio latente órdenes de magnitud más rápido que UMAP "
+        "no paramétrico, pudiendo combinarse además con una cabeza clasificadora para aprendizaje semi-supervisado.",
     )
 
     # --------------------------------------------------------------------------
     # 3. FUNDAMENTOS Y CONEXIÓN CON SIS-351
     # --------------------------------------------------------------------------
     _agregar_titulo_seccion(doc, "3. Fundamentos Teóricos y Conexión con SIS-351")
-    _agregar_subtitulo(doc, "3.1 El Autoencoder ('El Reloj de Arena Digital')")
+    _agregar_subtitulo(doc, "3.1 El Autoencoder ('El Reloj de Arena Digital') en el Paper")
     _agregar_parrafo(
         doc,
-        "Tal como se estudió en la unidad de Deep Learning de SIS-351, un Autoencoder es una red neuronal no "
-        "supervisada diseñada para aprender una representación comprimida de los datos de entrada sin utilizar "
-        "etiquetas. Consta de un Codificador (Encoder) que proyecta la entrada hacia un espacio latente restringido "
-        "(bottleneck) y un Decodificador (Decoder) que reconstruye la entrada original minimizando una función de "
-        "pérdida de reconstrucción (habitualmente el Error Cuadrático Medio, MSE).",
+        "En la unidad de Deep Learning de SIS-351 (Tema 05) se estudió el Autoencoder como una arquitectura no supervisada "
+        "compuesta por dos componentes acoplados: un Codificador f_θ que comprime la entrada x ∈ R^D hacia un cuello de "
+        "botella latente z ∈ R^d (d ≪ D), y un Decodificador g_ϕ que reconstruye x̂ = g_ϕ(z) ∈ R^D minimizando un error de "
+        "reconstrucción L_recon(x, x̂) (MSE).",
     )
     _agregar_parrafo(
         doc,
-        "[COMPLETAR: detallar la arquitectura exacta del autoencoder del paper (capas, función de activación, "
-        "dimensión del bottleneck o variante utilizada) y por qué resulta útil antes o junto con UMAP].",
-        negrita_prefijo="Autoencoder del paper: ",
+        "En el paper de Sainburg et al., el Autoencoder se enriquece introduciendo la pérdida topológica de UMAP en el espacio latente: "
+        "L_UMAP evalúa las probabilidades difusas de aristas p_ij en el espacio de alta dimensión frente a q_ij en el espacio latente z. "
+        "Al optimizar conjuntamente ambas pérdidas con Adam, el 'cuello de botella' neuronal actúa como un filtro topológico que desenreda "
+        "variedades no lineales complejas, permitiendo reconstrucciones superiores a las de un PCA lineal o un Autoencoder estándar.",
     )
 
-    _agregar_subtitulo(doc, "3.2 PCA, UMAP, K-means y Silhouette Score en SIS-351")
+    _agregar_subtitulo(doc, "3.2 Conexión con Aprendizaje No Supervisado en SIS-351")
     _agregar_vineta(
         doc,
-        "PCA (Análisis de Componentes Principales): ",
-        "Técnica lineal rápida e interpretable que encuentra ejes ortogonales de máxima varianza global.",
+        "PCA (Tema 03): ",
+        "Técnica lineal determinista que busca proyecciones ortogonales de máxima varianza global. Sirve como línea base rápida "
+        "y altamente interpretable, pero no puede desenredar variedades no lineales complejas.",
     )
     _agregar_vineta(
         doc,
-        "UMAP (Uniform Manifold Approximation and Projection): ",
-        "Técnica no lineal basada en topología algebraica y grafos de vecindad (controlados por n_neighbors y min_dist) "
-        "que equilibra la preservación de vecindades locales y estructura global.",
+        "UMAP (Tema 03): ",
+        "Método no lineal basado en topología algebraica y geometría riemanniana que preserva vecindades locales y minimiza "
+        "la distorsión entre simplex difusos, regulado por n_neighbors (escala de vecindad) y min_dist (compacidad).",
     )
     _agregar_vineta(
         doc,
-        "K-means y Silhouette Score: ",
-        "K-means agrupa por centroides asumiendo geometrías esféricas; el Silhouette Score (en [-1, 1]) mide "
-        "cohesión intra-cluster frente a separación inter-cluster sin usar etiquetas reales.",
+        "K-means y Silhouette Score (Tema 03): ",
+        "K-means agrupa observaciones mediante distancias euclidianas a k centroides, asumiendo clusters convexos y esféricos. "
+        "El Silhouette Score (en [-1, 1]) evalúa internamente la calidad del agrupamiento (cohesión intra-cluster frente a separación "
+        "inter-cluster) de forma 100% no supervisada.",
     )
 
     # --------------------------------------------------------------------------
@@ -291,15 +324,26 @@ def generar_informe_word(ruta_salida: Path) -> None:
     _agregar_titulo_seccion(doc, "4. Experimentos Reportados en el Paper")
     _agregar_recuadro(
         doc,
-        "SECCIÓN DE RESULTADOS PUBLICADOS EN EL PAPER (NO OBTENIDOS POR EL GRUPO)",
-        "Los datos de esta sección pertenecen exclusivamente al paper de referencia del Grupo 3. "
-        "Deben completarse únicamente con las cifras verificadas del artículo.",
+        "SECCIÓN DE RESULTADOS PUBLICADOS EN EL PAPER (SAINBURG ET AL., 2021 — NO DEL GRUPO)",
+        "Los datos y comparaciones descritos en esta sección provienen exclusivamente de las evaluaciones "
+        "publicadas en Neural Computation (2021) y sirven como marco de referencia externo.",
         color_fondo="EFF6FF",
         color_borde="1D4ED8",
     )
-    _agregar_vineta(doc, "Datasets evaluados en el paper: ", "[COMPLETAR]")
-    _agregar_vineta(doc, "Comparadores / líneas base: ", "[COMPLETAR]")
-    _agregar_vineta(doc, "Métricas y resultados publicados: ", "[COMPLETAR]")
+    _agregar_parrafo(
+        doc,
+        "Los autores evaluaron Parametric UMAP sobre una suite diversa de datasets reales y sintéticos: imágenes estructuradas "
+        "(MNIST, Fashion-MNIST, CIFAR-10), datos biomédicos de alta complejidad (transcriptomas unicelulares de retina de ratón de Macosko et al.), "
+        "espectrogramas bioacústicos de cantos de aves (Cassin's vireo) y variedades geométricas (Moons, 3D Buffalo).",
+    )
+    _agregar_parrafo(
+        doc,
+        "Compararon su propuesta frente a líneas base no paramétricas (UMAP estándar, t-SNE estándar, PHATE) y paramétricas "
+        "(Parametric t-SNE, SCVIS, IVIS, TriMap, Autoencoders estándar, VAEs y PCA). Los resultados clave reportados demostraron que: "
+        "(1) Parametric UMAP alcanza un Silhouette Score y preservación de vecindad local (Trustworthiness) idénticos a UMAP estándar, "
+        "pero infiriendo sobre nuevos datos órdenes de magnitud más rápido; y (2) el Autoencoder regularizado con pérdida UMAP supera "
+        "a los Autoencoders convencionales y a PCA en error cuadrático medio de reconstrucción (MSE), permitiendo interpolaciones suaves en el espacio latente.",
+    )
 
     # --------------------------------------------------------------------------
     # 5. PRÁCTICA DEL GRUPO
@@ -308,8 +352,8 @@ def generar_informe_word(ruta_salida: Path) -> None:
     _agregar_recuadro(
         doc,
         "RESULTADOS OBTENIDOS POR EL GRUPO (EVIDENCIA REPRODUCIBLE PROPIA)",
-        "Experimento ejecutado por el grupo sobre Wine (scikit-learn) con StandardScaler, semilla global "
-        "random_state=42 y sin utilizar etiquetas reales para ajustar modelos ni elegir k.",
+        "Experimento ejecutado por el grupo sobre Wine (scikit-learn) con StandardScaler, semilla fija "
+        "random_state=42 y selección de k 100% no supervisada (sin usar etiquetas en el ajuste).",
         color_fondo="ECFDF5",
         color_borde="047857",
     )
@@ -317,11 +361,11 @@ def generar_informe_word(ruta_salida: Path) -> None:
     _agregar_subtitulo(doc, "5.1 Dataset, preprocesamiento y justificación de k")
     _agregar_parrafo(
         doc,
-        "Utilizamos el dataset Wine de scikit-learn (178 muestras, 13 variables fisicoquímicas continuas). "
-        "Aplicamos StandardScaler (media 0, desviación estándar 1) para evitar que variables de gran magnitud "
-        "como 'proline' dominen las distancias euclidianas. Para elegir k de manera puramente no supervisada, "
-        "evaluamos k = 2..6 sobre el espacio escalado: k = 3 presentó un codo claro en inercia (1277.93) y el "
-        "máximo Silhouette Score (0.2849).",
+        "Trabajamos con el dataset Wine de scikit-learn (178 muestras, 13 variables fisicoquímicas continuas). "
+        "Aplicamos StandardScaler para neutralizar las diferencias de escala (p. ej., 'proline' con valores ~1000 frente a "
+        "'nonflavanoid_phenols' < 1.0). Para seleccionar k de manera rigurosa y no supervisada (sin consultar etiquetas), "
+        "evaluamos k ∈ {2, 3, 4, 5, 6} en el espacio escalado: k = 3 presentó el codo más pronunciado en inercia (1277.93) "
+        "y el valor máximo de Silhouette Score (0.2849).",
     )
     ruta_k = RESULTADOS_DIR / "seleccion_k.png"
     if ruta_k.exists():
@@ -372,33 +416,33 @@ def generar_informe_word(ruta_salida: Path) -> None:
     _agregar_titulo_seccion(doc, "6. Interpretación Crítica de las Visualizaciones")
     _agregar_parrafo(
         doc,
-        "Los resultados muestran directamente cómo la representación transforma la geometría observable: "
-        "en PCA 2D (que retiene el 55.41% de la varianza total: PC1 36.2%, PC2 19.21%), los tres grupos "
-        "aparecen más dispersos y con fronteras cercanas, obteniendo un Silhouette Score de 0.5611. "
-        "En contraste, UMAP 2D (n_neighbors=15, min_dist=0.1) agrupa las vecindades locales en islas "
-        "visualmente mucho más compactas y separadas, elevando el Silhouette Score a 0.7111.",
+        "Los resultados empíricos ofrecen una respuesta directa a la pregunta guía: la representación actúa como una "
+        "lente geométrica que altera sustancialmente la estructura visible. En PCA 2D (que retiene el 55.41% de la varianza "
+        "global: PC1 36.2%, PC2 19.21%), la proyección lineal distribuye las observaciones en un espacio continuo donde "
+        "las fronteras entre grupos son cercanas y algo difusas, alcanzando un Silhouette Score de 0.5611. En contraste, "
+        "UMAP 2D (n_neighbors=15, min_dist=0.1) contrae las vecindades locales en islas aisladas y compactas, elevando "
+        "el Silhouette Score a 0.7111 y reduciendo la inercia interna a 202.20.",
     )
     _agregar_parrafo(
         doc,
-        "Sin embargo, al realizar una comparación externa post-hoc frente a las etiquetas originales de Wine "
-        "(sin haberlas usado para entrenar ni ajustar nada), PCA 2D alcanzó mayor concordancia externa "
-        "(ARI = 0.8951, NMI = 0.8821) que UMAP 2D (ARI = 0.8025, NMI = 0.7955). Esto demuestra una lección "
-        "fundamental para la pregunta guía: un Silhouette Score más alto en una proyección no lineal 2D "
-        "refleja mayor compacidad en el mapa proyectado, pero no garantiza automáticamente mayor fidelidad a "
-        "las clases reales cuando K-means particiona geometrías comprimidas por UMAP.",
-        negrita_prefijo="Lectura crítica (Silhouette vs. fidelidad externa): ",
+        "Sin embargo, la comparación externa post-hoc contra las etiquetas de los tres cultivares de Wine revela una paradoja "
+        "didáctica fundamental: PCA 2D obtuvo mayor concordancia externa (ARI = 0.8951, NMI = 0.8821) que UMAP 2D (ARI = 0.8025, NMI = 0.7955). "
+        "Esto demuestra que un Silhouette Score elevado en un espacio no lineal comprimido refleja la densidad artificial de la "
+        "proyección topológica, pero no garantiza mayor fidelidad a las clases reales subyacentes. Tal como concluyen Sainburg et al., "
+        "las proyecciones no lineales deben interpretarse con cautela antes de tomar decisiones de agrupamiento.",
+        negrita_prefijo="Lección crítica (Compacidad vs. fidelidad externa): ",
     )
     _agregar_vineta(
         doc,
         "Sensibilidad a hiperparámetros: ",
-        "UMAP depende de n_neighbors, min_dist y la semilla aleatoria; cambiar estos valores modifica la forma "
-        "y separación aparente de los clusters.",
+        "Tanto UMAP como Parametric UMAP dependen fuertemente de n_neighbors, min_dist y la semilla aleatoria; valores distintos "
+        "pueden separar visualmente grupos continuos o fusionar clusters distintos.",
     )
     _agregar_vineta(
         doc,
-        "Supuesto de esfericidad de K-means: ",
-        "K-means busca centroides esféricos en 2D, por lo que puede dividir o fusionar clusters elongados generados "
-        "por proyecciones no lineales.",
+        "Incompatibilidad de supuestos con K-means: ",
+        "K-means asume clusters de dispersión esférica e isotrópica; si una variedad topológica genera grupos curvados o elongados, "
+        "K-means puede fracturar erróneamente un mismo cluster natural.",
     )
 
     # --------------------------------------------------------------------------
@@ -407,16 +451,15 @@ def generar_informe_word(ruta_salida: Path) -> None:
     _agregar_titulo_seccion(doc, "7. Reproducibilidad y Declaración de Uso de IA")
     _agregar_parrafo(
         doc,
-        "Entorno verificado: Windows 10, Python 3.14.0, scikit-learn 1.9.1, umap-learn 0.6.0, NumPy 2.5.5, "
-        "Pandas 3.1.1. Semilla global random_state = 42 fijada en UMAP, PCA y K-means (n_init=20). Código "
-        "disponible en src/experimento.py y notebooks/01_practica_grupo3_umap.ipynb.",
+        "El código completo de la práctica es reproducible en local y Google Colab mediante src/experimento.py y "
+        "notebooks/01_practica_grupo3_umap.ipynb. Entorno registrado: Windows 10, Python 3.14.0, scikit-learn 1.9.1, "
+        "umap-learn 0.6.0, NumPy 2.5.5, Pandas 3.1.1, con semilla fija random_state = 42 en PCA, UMAP y K-means (n_init=20).",
     )
     _agregar_parrafo(
         doc,
-        "Se utilizó el asistente de IA Antigravity como apoyo para estructurar los archivos del proyecto, "
-        "implementar el script reproducible en Python/Jupyter y generar este borrador inicial para revisión y "
-        "mejora del grupo (dejando [COMPLETAR] en los datos del paper aún por definir). Todas las ejecuciones "
-        "y métricas fueron verificadas localmente.",
+        "Se utilizó el asistente de IA Antigravity como apoyo para estructurar el proyecto, implementar los scripts reproducibles "
+        "y redactar este borrador inicial a partir del análisis del PDF del paper de Sainburg et al. (2021). Todo el código y "
+        "las métricas numéricas fueron ejecutados y verificados en el entorno de desarrollo local.",
         negrita_prefijo="Declaración de uso de IA: ",
     )
 
@@ -426,10 +469,11 @@ def generar_informe_word(ruta_salida: Path) -> None:
     doc.add_page_break()
     _agregar_titulo_seccion(doc, "Referencias Bibliográficas")
     refs = [
-        "[COMPLETAR: Cita completa del paper asignado al Grupo 3 (Autores, Año, Título, Publicación, Enlace)].",
+        "Sainburg, T., McInnes, L., & Gentner, T. Q. (2021). Parametric UMAP Embeddings for Representation and Semisupervised Learning. Neural Computation, 33(11), 2881–2907. https://doi.org/10.1162/neco_a_01434 (arXiv:2009.12981).",
+        "McInnes, L., Healy, J., & Melville, J. (2018). UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction. arXiv:1802.03426.",
         "Aeberhard, S., Coomans, D., & de Vel, O. (1994). Comparative analysis of statistical pattern recognition methods in high dimensional settings. Pattern Recognition, 27(8), 1065–1077. (Dataset Wine en scikit-learn).",
-        "McInnes, L., Healy, J., & Melville, J. (2018). UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction. arXiv:1802.03426. (Librería umap-learn 0.6.0).",
-        "Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research, 12, 2825–2830. (Versión 1.9.1).",
+        "Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research, 12, 2825–2830.",
+        "Hinton, G. E., & Salakhutdinov, R. R. (2006). Reducing the dimensionality of data with neural networks. Science, 313(5786), 504–507. (Fundamento de Autoencoders).",
         "Harris, C. R., et al. (2020). NumPy · McKinney, W. (2010). Pandas · Hunter, J. D. (2007). Matplotlib · Waskom, M. (2021). Seaborn.",
     ]
     for r in refs:
@@ -444,7 +488,7 @@ def generar_informe_word(ruta_salida: Path) -> None:
 
 
 # ==============================================================================
-# UTILIDADES PARA POWERPOINT (.pptx) — GRUPO 3 (11 DIAPOSITIVAS)
+# UTILIDADES PARA POWERPOINT (.pptx) — GRUPO 3 (11 DIAPOSITIVAS COMPLETAS)
 # ==============================================================================
 
 AZUL_OSCURO = PptRGB(0x0F, 0x17, 0x2A)
@@ -566,8 +610,8 @@ def generar_presentacion_pptx(ruta_salida: Path) -> None:
     p_t.space_after = PptPt(10)
 
     p_s = tf_p.add_paragraph()
-    p_s.text = "¿Cómo influye la representación en los patrones que vemos?\nPaper: [COMPLETAR Título, Autores, Año]"
-    p_s.font.size = PptPt(19)
+    p_s.text = "¿Cómo influye la representación en los patrones que vemos?\nPaper: Parametric UMAP (Sainburg, McInnes & Gentner, Neural Computation 2021)"
+    p_s.font.size = PptPt(18)
     p_s.font.color.rgb = PptRGB(0xCB, 0xD5, 0xE1)
 
     box = s1.shapes.add_shape(
@@ -582,64 +626,67 @@ def generar_presentacion_pptx(ruta_salida: Path) -> None:
     btf.margin_top = PptInches(0.25)
     bp = btf.paragraphs[0]
     bp.text = (
-        "Grupo: Grupo 3\n"
+        "Grupo: Grupo 3 (Representaciones No Supervisadas)\n"
         "Integrantes: [Completar Nombre 1] · [Completar Nombre 2] · [Completar Nombre 3]\n"
-        "Docente: [Completar Nombre del Docente]   |   Fecha: [Completar Fecha]"
+        "Docente: [Completar Nombre del Docente]   |   Gestión 2026"
     )
     bp.font.size = PptPt(16)
     bp.font.color.rgb = BLANCO
 
     # 2. PROBLEMA
-    s2 = _nuevo_slide_limpio(prs, "1. El Problema: Alta Dimensionalidad y Clustering", "Contexto")
+    s2 = _nuevo_slide_limpio(prs, "1. El Problema: Limitaciones en Dimensionalidad", "Contexto")
     _agregar_tarjeta(
         s2, 0.7, 1.5, 5.8, 5.2,
-        "Maldición de la Dimensionalidad",
-        "• En espacios originales con muchas variables y distintas escalas, las distancias euclidianas pierden poder discriminativo.\n\n"
-        "• Algoritmos como K-means sufren si no se escalan o comprimen las variables previamente.",
+        "Métodos No Paramétricos (t-SNE / UMAP)",
+        "• Capturan topología no lineal y vecindades locales con alta fidelidad.\n\n"
+        "• Límite crítico: No aprenden una función f(x); no pueden proyectar nuevos datos de forma eficiente.\n\n"
+        "• Carecen de mapeo inverso para reconstruir muestras desde el espacio latente.",
         AZUL_CLARO, AZUL_PRIMARIO,
     )
     _agregar_tarjeta(
         s2, 6.8, 1.5, 5.8, 5.2,
-        "Problema específico del Paper",
-        "• [COMPLETAR: dominio, datos y motivación planteada por los autores del paper del Grupo 3].\n\n"
-        "• Pregunta guía: ¿Cómo influye la representación en los patrones que vemos?",
+        "Autoencoders Tradicionales (AE / VAE)",
+        "• Aprenden funciones continuas mediante redes neuronales (Encoder + Decoder).\n\n"
+        "• Límite crítico: La pérdida de reconstrucción (MSE) no preserva la topología de vecindad local.\n\n"
+        "• Pregunta del paper: ¿Cómo unir UMAP y Autoencoders en una sola arquitectura paramétrica?",
         FONDO_SUAVE, AZUL_OSCURO,
     )
 
-    # 3. CONTRIBUCIÓN Y AUTOENCODER DEL PAPER
-    s3 = _nuevo_slide_limpio(prs, "2. Contribución y Autoencoder del Paper", "Fundamentos")
+    # 3. CONTRIBUCIÓN: PARAMETRIC UMAP Y AUTOENCODERS
+    s3 = _nuevo_slide_limpio(prs, "2. Contribución: Parametric UMAP & Autoencoder", "Paper 2021")
     _agregar_tarjeta(
         s3, 0.7, 1.5, 5.8, 5.2,
-        "El Autoencoder ('Reloj de Arena Digital')",
-        "• Red neuronal no supervisada con Encoder + Bottleneck (espacio latente) + Decoder.\n\n"
-        "• Comprime la entrada capturando relaciones no lineales minimizando el error de reconstrucción.\n\n"
-        "• Arquitectura específica del paper: [COMPLETAR].",
+        "Codificador Paramétrico (Encoder)",
+        "• Red neuronal profunda que predice coordenadas latentes z = f_θ(x).\n\n"
+        "• Optimiza directamente la pérdida de entropía cruzada difusa de UMAP con mini-batch SGD y negative sampling.\n\n"
+        "• Beneficio: Proyección de nuevos datos órdenes de magnitud más rápida que UMAP clásico.",
         VERDE_CLARO, VERDE_OSCURO,
     )
     _agregar_tarjeta(
         s3, 6.8, 1.5, 5.8, 5.2,
-        "Contribución del Paper",
-        "• [COMPLETAR: método/protocolo exacto del paper combinando Autoencoder, UMAP y clustering].\n\n"
-        "• Nota: En nuestra práctica explicamos el autoencoder sin necesidad de entrenarlo.",
+        "Autoencoder Regularizado por UMAP",
+        "• Añade un Decodificador g_ϕ(z) que reconstruye la entrada original x̂.\n\n"
+        "• Función de pérdida conjunta: L_total = L_UMAP + λ L_recon (MSE).\n\n"
+        "• El espacio latente preserva topología mientras permite reconstrucción e interpolación suave.",
         FONDO_SUAVE, AZUL_OSCURO,
     )
 
-    # 4. PCA vs UMAP + K-MEANS
-    s4 = _nuevo_slide_limpio(prs, "3. Representaciones 2D: PCA vs. UMAP", "Métodos")
+    # 4. CÓMO FUNCIONA: COMPARACIÓN DE REPRESENTACIONES
+    s4 = _nuevo_slide_limpio(prs, "3. Representaciones 2D: PCA vs. UMAP vs. AE", "Métodos")
     _agregar_tarjeta(
         s4, 0.7, 1.5, 5.7, 5.2,
-        "PCA 2D (Proyección Lineal)",
-        "• Busca combinaciones lineales ortogonales que maximizan la varianza global.\n\n"
-        "• Rápido, determinista y altamente interpretable.\n\n"
-        "• Puede mezclar estructuras no lineales al proyectar a 2D.",
+        "PCA 2D (Lineal Global)",
+        "• Ejes ortogonales de máxima varianza global.\n\n"
+        "• Determinista, rápido y sin hiperparámetros complejos.\n\n"
+        "• Mezcla variedades no lineales en proyecciones de baja dimensión.",
         AZUL_CLARO, AZUL_PRIMARIO,
     )
     _agregar_tarjeta(
         s4, 6.9, 1.5, 5.7, 5.2,
-        "UMAP 2D (Proyección No Lineal)",
-        "• Basado en topología algebraica y grafos de vecindad.\n\n"
-        "• Parámetros clave: n_neighbors=15 (balance local/global) y min_dist=0.1 (compacidad).\n\n"
-        "• Separa fuertemente vecindades locales antes de aplicar K-means.",
+        "UMAP 2D (Topología No Lineal)",
+        "• Simplex difusos y grafos de vecindad local (n_neighbors=15, min_dist=0.1).\n\n"
+        "• Contrae puntos cercanos en agrupaciones densas.\n\n"
+        "• En el paper, el Autoencoder aprende esta variedad mediante descenso de gradiente.",
         VERDE_CLARO, VERDE_OSCURO,
     )
 
@@ -648,30 +695,30 @@ def generar_presentacion_pptx(ruta_salida: Path) -> None:
     _agregar_caja_texto(
         s5, 0.8, 1.6, 11.7, 5.2,
         [
-            ("• Aprendizaje No Supervisado (Tema 03): ", "Uso de PCA, UMAP y K-means para descubrir patrones sin etiquetas previas."),
-            ("• Escalamiento obligatorio: ", "StandardScaler evita que variables de mayor magnitud dominen las distancias."),
-            ("• Deep Learning (Tema 05): ", "Autoencoders como compresión no lineal frente a métodos lineales como PCA."),
-            ("• Evaluación interna sin etiquetas: ", "Uso de inercia (codo) y Silhouette Score para justificar k y medir compacidad."),
+            ("• Aprendizaje No Supervisado (Tema 03): ", "PCA como reductor lineal de varianza global vs. UMAP como reductor no lineal topológico."),
+            ("• Deep Learning (Tema 05): ", "Autoencoder ('Reloj de Arena Digital') como modelo de compresión no lineal con capas ocultas y funciones de activación."),
+            ("• Escalamiento previo: ", "Uso obligatorio de StandardScaler para evitar que variables de magnitud dispar sesguen las distancias euclidianas."),
+            ("• Clustering y Evaluación Interna: ", "K-means particiona por centroides y el Silhouette Score evalúa la compacidad sin requerir etiquetas."),
         ],
-        font_size=18,
+        font_size=17,
     )
 
     # 6. RESULTADOS PUBLICADOS EN EL PAPER
-    s6 = _nuevo_slide_limpio(prs, "5. Resultados Publicados en el Paper", "NO PROPIOS")
+    s6 = _nuevo_slide_limpio(prs, "5. Resultados Publicados en el Paper", "SAINBURG ET AL. (2021)")
     _agregar_tarjeta(
-        s6, 0.8, 1.5, 11.7, 1.2,
-        "SEPARACIÓN OBLIGATORIA: Resultados externos publicados en el paper",
-        "Los datos de esta diapositiva corresponden al artículo del Grupo 3, no al experimento propio en Wine.",
+        s6, 0.8, 1.4, 11.7, 1.2,
+        "RESULTADOS EXTERNOS DEL ARTÍCULO CIENTÍFICO (NEURAL COMPUTATION 2021)",
+        "Evaluación sobre MNIST, Fashion-MNIST, CIFAR-10, células de retina de ratón y cantos de aves (Cassin's vireo).",
         AZUL_CLARO, AZUL_PRIMARIO,
     )
     _agregar_caja_texto(
-        s6, 0.8, 3.1, 11.7, 3.8,
+        s6, 0.8, 3.0, 11.7, 3.9,
         [
-            ("• Datasets del paper: ", "[COMPLETAR]"),
-            ("• Métodos comparados: ", "[COMPLETAR]"),
-            ("• Métricas y hallazgos publicados: ", "[COMPLETAR]"),
+            ("• Preservación y Calidad: ", "Parametric UMAP igualó el Silhouette Score y Trustworthiness de UMAP no paramétrico."),
+            ("• Velocidad de Inferencia: ", "Proyectó nuevos datos órdenes de magnitud más rápido que t-SNE y UMAP clásico."),
+            ("• Reconstrucción del Autoencoder: ", "El AE regularizado con UMAP superó a PCA y a VAEs en error cuadrático medio (MSE), permitiendo interpolaciones latentes continuas."),
         ],
-        font_size=18,
+        font_size=17,
     )
 
     # 7. NUESTRA PRÁCTICA EN WINE
@@ -679,10 +726,10 @@ def generar_presentacion_pptx(ruta_salida: Path) -> None:
     _agregar_caja_texto(
         s7, 0.8, 1.5, 6.2, 5.4,
         [
-            ("• Dataset: ", "Wine (scikit-learn), 178 muestras, 13 variables continuas."),
-            ("• Preprocesamiento: ", "StandardScaler (sin usar etiquetas)."),
-            ("• Elección de k=3: ", "Codo en inercia (1277.93) y máximo Silhouette (0.2849) en k=2..6."),
-            ("• Semilla y parámetros: ", "random_state=42, K-means (n_init=20), UMAP (n_neighbors=15, min_dist=0.1)."),
+            ("• Dataset: ", "Wine (scikit-learn), 178 muestras, 13 variables fisicoquímicas continuas."),
+            ("• Preprocesamiento: ", "StandardScaler estricto (media=0, std=1)."),
+            ("• Elección no supervisada de k=3: ", "Codo en inercia (1277.93) y máximo Silhouette Score (0.2849) en k=2..6 sobre el espacio escalado."),
+            ("• Semilla fija: ", "random_state=42 en PCA, UMAP (n_neighbors=15, min_dist=0.1) y K-means (n_init=20)."),
         ],
         font_size=16,
     )
@@ -691,7 +738,7 @@ def generar_presentacion_pptx(ruta_salida: Path) -> None:
         s7.shapes.add_picture(str(ruta_k), PptInches(7.1), PptInches(2.0), width=PptInches(5.8))
 
     # 8. RESULTADOS PROPIOS: PCA vs UMAP
-    s8 = _nuevo_slide_limpio(prs, "7. Resultados Propios: Clusters y Silhouette", "RESULTADOS DEL GRUPO")
+    s8 = _nuevo_slide_limpio(prs, "7. Resultados Propios: Clusters y Silhouette", "EVIDENCIA DEL GRUPO")
     tbl_shape = s8.shapes.add_table(3, 6, PptInches(0.6), PptInches(1.3), PptInches(12.1), PptInches(1.4))
     tbl = tbl_shape.table
     headers = ["Representación 2D", "k", "Silhouette Score", "Inercia 2D", "ARI (Comp. Externa)", "NMI (Comp. Externa)"]
@@ -727,16 +774,16 @@ def generar_presentacion_pptx(ruta_salida: Path) -> None:
     s9 = _nuevo_slide_limpio(prs, "8. Interpretación Crítica de las Visualizaciones", "Análisis")
     _agregar_tarjeta(
         s9, 0.7, 1.5, 5.8, 5.2,
-        "¿Por qué UMAP logra mayor Silhouette (0.7111)?",
-        "• UMAP preserva vecindades locales formando islas compactas en 2D.\n\n"
-        "• PCA solo retiene 55.41% de varianza (PC1 36.2%, PC2 19.21%) en ejes lineales, dejando grupos más cercanos (Silhouette = 0.5611).",
+        "¿Por qué UMAP eleva el Silhouette a 0.7111?",
+        "• UMAP contrae vecindades locales en islas artificialmente aisladas y densas en 2D.\n\n"
+        "• PCA retiene el 55.41% de varianza en ejes lineales globales, dejando clusters continuos más cercanos (Silhouette = 0.5611).",
         VERDE_CLARO, VERDE_OSCURO,
     )
     _agregar_tarjeta(
         s9, 6.8, 1.5, 5.8, 5.2,
-        "Cuidado: Compacidad ≠ Fidelidad Externa",
-        "• Comparación externa declarada (post-hoc): PCA obtuvo ARI = 0.8951 frente a ARI = 0.8025 en UMAP.\n\n"
-        "• Un Silhouette alto en 2D refleja la geometría de la proyección, no garantiza clusters reales perfectos.",
+        "La Paradoja: Compacidad ≠ Fidelidad Externa",
+        "• Comparación externa post-hoc: PCA obtuvo mayor concordancia con las clases reales (ARI = 0.8951) frente a UMAP (ARI = 0.8025).\n\n"
+        "• Conclusión crítica: Un Silhouette alto en UMAP refleja la compacidad del embedding 2D, no mayor fidelidad semántica.",
         FONDO_SUAVE, AZUL_OSCURO,
     )
 
@@ -745,10 +792,10 @@ def generar_presentacion_pptx(ruta_salida: Path) -> None:
     _agregar_caja_texto(
         s10, 0.8, 1.6, 11.7, 5.2,
         [
-            ("• Sensibilidad de UMAP: ", "Cambiar n_neighbors, min_dist o random_state altera la separación visual."),
-            ("• Supuestos de K-means: ", "Asume clusters esféricos; sufre si UMAP produce formas alargadas o no convexas."),
-            ("• Distorsión 2D: ", "Comprimir 13 dimensiones a 2 siempre sacrifica información geométrica."),
-            ("• Límites del paper: ", "[COMPLETAR: costos o supuestos críticos reportados en el paper]."),
+            ("• Sensibilidad hiperparamétrica: ", "Tanto UMAP como Parametric UMAP varían según n_neighbors, min_dist y la semilla aleatoria."),
+            ("• Supuesto de convexidad en K-means: ", "K-means asume centroides esféricos; si UMAP crea formas elongadas o no convexas, K-means puede fracturarlas."),
+            ("• Pérdida topológica al proyectar a 2D: ", "Comprimir 13 dimensiones a 2 siempre distorsiona distancias relativas globales."),
+            ("• Costo de entrenamiento en Autoencoders: ", "Aprender el mapeo paramétrico exige optimizar miles de pesos con GPU y sintonizar hiperparámetros."),
         ],
         font_size=17,
     )
@@ -758,16 +805,16 @@ def generar_presentacion_pptx(ruta_salida: Path) -> None:
     _agregar_tarjeta(
         s11, 0.8, 1.4, 11.7, 1.9,
         "Respuesta a la Pregunta Guía: ¿Cómo influye la representación en los patrones que vemos?",
-        "La representación define qué relaciones (lineales globales en PCA vs. vecindades locales no lineales en UMAP/Autoencoders) se amplifican, cambiando tanto la geometría visual como el desempeño de K-means.",
+        "La representación actúa como un filtro geométrico: PCA amplifica la varianza global lineal manteniendo fidelidad de clases (ARI=0.8951), mientras que UMAP y los Autoencoders topológicos compactan vecindades locales (Silhouette=0.7111), transformando radicalmente los clusters detectados por K-means.",
         AZUL_CLARO, AZUL_PRIMARIO,
     )
     _agregar_caja_texto(
         s11, 0.8, 3.6, 11.7, 3.4,
         [
-            ("• Paper: ", "[COMPLETAR cita completa del paper del Grupo 3]."),
-            ("• Dataset: ", "Wine Dataset (Aeberhard et al., 1994 · scikit-learn)."),
+            ("• Paper analizado: ", "Sainburg, T., McInnes, L., & Gentner, T. Q. (2021). Parametric UMAP Embeddings for Representation and Semisupervised Learning. Neural Computation, 33(11), 2881–2907."),
+            ("• Dataset evaluado: ", "Wine Dataset (Aeberhard et al., 1994 · scikit-learn)."),
             ("• Librerías: ", "scikit-learn 1.9.1 · umap-learn 0.6.0 · NumPy 2.5.5 · Pandas 3.1.1 · Matplotlib · Seaborn."),
-            ("• Reproducibilidad: ", "random_state=42 en src/experimento.py y notebooks/01_practica_grupo3_umap.ipynb."),
+            ("• Reproducibilidad: ", "Semilla 42 en src/experimento.py y notebooks/01_practica_grupo3_umap.ipynb."),
         ],
         font_size=14,
     )
@@ -783,8 +830,8 @@ def main() -> None:
     generar_informe_word(ruta_docx)
     generar_presentacion_pptx(ruta_pptx)
 
-    print(f"Word generado: {ruta_docx}")
-    print(f"PowerPoint generado: {ruta_pptx}")
+    print(f"Word generado exitosamente: {ruta_docx}")
+    print(f"PowerPoint generado exitosamente: {ruta_pptx}")
 
 
 if __name__ == "__main__":

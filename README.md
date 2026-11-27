@@ -5,10 +5,11 @@ Comparación experimental reproducible de representaciones en 2D (**PCA** vs. **
 ---
 
 ## 1. Paper de Referencia
-* **Título:** `[COMPLETAR]`
-* **Autores:** `[COMPLETAR]`
-* **Año / Publicación:** `[COMPLETAR]`
-* **Enlace / Versión:** `[COMPLETAR]`
+* **Título:** *Parametric UMAP Embeddings for Representation and Semisupervised Learning*
+* **Autores:** Tim Sainburg, Leland McInnes, Timothy Q. Gentner
+* **Publicación:** *Neural Computation*, Vol. 33, No. 11, pp. 2881–2907, 2021 (MIT Press). Comunicado por Terrence Sejnowski.
+* **Enlaces:** [DOI: 10.1162/neco_a_01434](https://doi.org/10.1162/neco_a_01434) · [arXiv:2009.12981](https://arxiv.org/abs/2009.12981)
+* **Conexión con el proyecto:** El artículo fundamenta la unión entre reducción de dimensionalidad no lineal (UMAP) y redes neuronales profundas (Autoencoders), proponiendo una pérdida conjunta ($\mathcal{L}_{\text{UMAP}} + \mathcal{L}_{\text{recon}}$) para regularizar el espacio latente y acelerar la inferencia en representaciones no supervisadas.
 
 ---
 
@@ -29,7 +30,7 @@ Comparación experimental reproducible de representaciones en 2D (**PCA** vs. **
 ```text
 proyecto_3er_parcial/
 ├── CONTEXTO.md                          # Guía y alcance del proyecto (Grupo 3)
-├── BORRADOR_7_PREGUNTAS.md              # Respuestas a las 7 preguntas (campos del paper con [COMPLETAR])
+├── BORRADOR_7_PREGUNTAS.md              # Respuestas a las 7 preguntas obligatorias del paper
 ├── README.md                            # Este archivo (instrucciones de reproducción)
 ├── requirements.txt                     # Dependencias con versiones fijas
 ├── notebooks/
@@ -92,6 +93,6 @@ proyecto_3er_parcial/
 En cumplimiento con las buenas prácticas de SIS-351:
 * **Herramienta utilizada:** Antigravity (asistente de IA para ingeniería de software).
 * **Apoyo recibido:**
-  1. Actualización de `CONTEXTO.md`, `BORRADOR_7_PREGUNTAS.md` y `README.md` para la práctica del Grupo 3 (dejando `[COMPLETAR]` en los datos del paper aún no definidos).
+  1. Análisis riguroso del paper *Parametric UMAP Embeddings for Representation and Semisupervised Learning* (Sainburg et al., 2021) y actualización de `CONTEXTO.md` y `BORRADOR_7_PREGUNTAS.md`.
   2. Implementación de `src/experimento.py`, `notebooks/01_practica_grupo3_umap.ipynb` y `src/generar_entregables.py` (Word y PowerPoint).
 * **Verificación humana:** Todo el código, el escalado, la selección de $k$, las proyecciones PCA/UMAP y las métricas exportadas en `resultados/` fueron ejecutados y verificados en el entorno `.venv` local (Python 3.14.0, `scikit-learn 1.9.1`, `umap-learn 0.6.0`).
